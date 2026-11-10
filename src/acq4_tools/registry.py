@@ -24,58 +24,58 @@ class ToolSpec:
 
 TOOLS = (
     ToolSpec(
-        "fix_objscale",
-        "Fix Objective Scale",
-        "Correct the objective and scale recorded in .index files for images and videos.",
-        "acq4_tools.tools.fix_objscale",
+        "rig_config",
+        "Acq4 Rig Config",
+        "Check a devices.cfg: DAQ wiring, optomechanical tree, and names against the acq4 source.",
+        "acq4_tools.tools.rig_config",
+    ),
+    ToolSpec(
+        "default_cfg",
+        "Acq4 Config",
+        "Edit acq4's default.cfg: modules and shortcuts, directories and options.",
+        "acq4_tools.tools.default_cfg",
+    ),
+    ToolSpec(
+        "folder_types",
+        "Acq4 Folders",
+        "Edit acq4's folderTypes.cfg: the folders and fields offered by the Data Manager.",
+        "acq4_tools.tools.folder_types",
     ),
     ToolSpec(
         "fix_directory_order",
-        "Fix Directory Order",
+        "Data Order",
         "Diagnose a day directory's structure and show the corrections to make in the "
         "Data Manager.",
         "acq4_tools.tools.fix_directory_order",
     ),
     ToolSpec(
         "dir_check",
-        "Directory Check",
+        "Check Directories",
         "Check the day/slice/cell/protocol hierarchy and produce a report.",
         "acq4_tools.tools.dir_check",
     ),
     ToolSpec(
+        "fix_objscale",
+        "Objective Scale",
+        "Correct the objective and scale recorded in .index files for images and videos.",
+        "acq4_tools.tools.fix_objscale",
+    ),
+    ToolSpec(
         "empty_index",
-        "Empty Index Files",
+        "Find Empty .index",
         "Find .index files that are empty or nearly empty.",
         "acq4_tools.tools.empty_index",
+    ),
+    ToolSpec(
+        "index_transfer",
+        "Retrieve .index Files",
+        "Upload .index files that are missing from a remote system.",
+        "acq4_tools.tools.index_transfer",
     ),
     ToolSpec(
         "day_slice_archive",
         "Day/Slice Archive",
         "Make a tar file of the day and slice levels of the data, without the cells.",
         "acq4_tools.tools.day_slice_archive",
-    ),
-    ToolSpec(
-        "index_transfer",
-        "Index File Transfer",
-        "Upload .index files that are missing from a remote system.",
-        "acq4_tools.tools.index_transfer",
-    ),
-    ToolSpec(
-        "default_cfg",
-        "Default Config",
-        "Edit acq4's default.cfg: modules and shortcuts, directories and options.",
-        "acq4_tools.tools.default_cfg",
-    ),
-    ToolSpec(
-        "folder_types",
-        "Folder Types",
-        "Edit acq4's folderTypes.cfg: the folders and fields offered by the Data Manager.",
-        "acq4_tools.tools.folder_types",
-    ),
-    ToolSpec(
-        "rig_config",
-        "Rig Configuration",
-        "Check a devices.cfg: DAQ wiring, optomechanical tree, and names against the acq4 source.",
-        "acq4_tools.tools.rig_config",
     ),
 )

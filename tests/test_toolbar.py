@@ -41,16 +41,16 @@ def test_controls_have_their_own_row_below_the_tools(toolbar):
     assert cell(toolbar, toolbar.close_button) == (below_tools, 2)
 
 
-@pytest.mark.parametrize("count,rows", [(1, 1), (8, 1), (9, 2), (16, 2), (17, 3)])
-def test_tools_wrap_after_eight(qtbot, count, rows):
+@pytest.mark.parametrize("count,rows", [(1, 1), (6, 1), (7, 2), (12, 2), (13, 3)])
+def test_tools_wrap_after_six(qtbot, count, rows):
     window = make_toolbar(count)
     qtbot.addWidget(window)
     cells = [cell(window, b) for b in window.buttons.values()]
     assert max(c[0] for c in cells) + 1 == rows
-    assert max(c[1] for c in cells) <= 7
-    assert cells[-1] == ((count - 1) // 8, (count - 1) % 8)
+    assert max(c[1] for c in cells) <= 5
+    assert cells[-1] == ((count - 1) // 6, (count - 1) % 6)
     assert cell(window, window.status) == (rows, 0)
-    assert window.grid.columnCount() == max(min(count, 8), 3)
+    assert window.grid.columnCount() == max(min(count, 6), 3)
 
 
 def test_items_are_equally_wide_and_stay_put_when_a_tool_opens(toolbar):
@@ -60,7 +60,7 @@ def test_items_are_equally_wide_and_stay_put_when_a_tool_opens(toolbar):
     items = [*tool_buttons, toolbar.status, toolbar.close_button]
     assert len({item.width() for item in items}) == 1
     lefts = [item.x() for item in items]
-    tool_lefts = [button.x() for button in tool_buttons[:8]]
+    tool_lefts = [button.x() for button in tool_buttons[:6]]
     assert len({b - a for a, b in zip(tool_lefts, tool_lefts[1:])}) == 1
     assert toolbar.status.x() == tool_lefts[0]
     assert toolbar.close_button.x() == tool_lefts[2]

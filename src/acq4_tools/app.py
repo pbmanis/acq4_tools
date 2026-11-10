@@ -15,7 +15,8 @@ from acq4_tools.registry import TOOLS, ToolSpec
 APP_NAME = "acq4 Tools"
 _KEEP_ON_TOP = "toolbar.keep_on_top"
 _GEOMETRY = "toolbar.horizontal_geometry"
-_MAX_TOOLS_PER_ROW = 8
+_MAX_TOOLS_PER_ROW = 6
+_FONT_SCALE = 0.85  # the toolbar's text, relative to the application font
 
 
 class ToolbarWindow(QtWidgets.QWidget):
@@ -27,9 +28,13 @@ class ToolbarWindow(QtWidgets.QWidget):
         self._quit_confirmed = False
 
         self.setWindowTitle(APP_NAME)
+        font = self.font()
+        font.setPointSizeF(font.pointSizeF() * _FONT_SCALE)
+        self.setFont(font)
+        self.setStyleSheet("QPushButton { padding: 2px 6px; }")
         self.grid = QtWidgets.QGridLayout(self)
-        self.grid.setContentsMargins(8, 8, 8, 8)
-        self.grid.setSpacing(6)
+        self.grid.setContentsMargins(6, 6, 6, 6)
+        self.grid.setSpacing(4)
         # The window always fits the grid, whatever size was last saved.
         self.grid.setSizeConstraint(QtWidgets.QLayout.SizeConstraint.SetFixedSize)
 
