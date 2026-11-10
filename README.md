@@ -12,6 +12,9 @@ several tools can be open at once.
 | Empty Index Files | Find `.index` files that are empty or nearly empty. |
 | Day/Slice Archive | Make a tar file of the day and slice levels of the data, including each day's `.index` and the slices' label directories, without the cells. |
 | Index File Transfer | Upload `.index` files that are missing from a remote system over SFTP. Never overwrites. |
+| Default Config | Edit acq4's `default.cfg`: modules and shortcuts, directories, configurations and options. |
+| Folder Types | Edit acq4's `folderTypes.cfg`: the folders and metadata fields offered by the Data Manager. |
+| Rig Configuration | Edit and check a `devices.cfg`: device settings, enabling and swapping commented-out devices, DAQ wiring diagram and line map, optomechanical tree, and parameter names against the acq4 source. |
 
 ## Running from source
 
@@ -54,6 +57,12 @@ packaged defaults on first use, so edit this copy for your rig). Both are in an
 
 Set the `ACQ4_TOOLS_CONFIG_DIR` environment variable to use another location.
 Passwords are never saved.
+
+## Config editors
+
+The config editors change only the lines you edit, so comments, commented-out options and `readConfigFile(...)` includes are kept. Each save leaves the previous version beside the file as `<name>.bak`.
+
+Rig Configuration reads the acq4 source without importing it, so the hardware libraries are not needed. The only things it adds to `devices.cfg` are comment lines at the end of the file starting `## acq4_tools`, which record each DAQ's board and which devices are alternates. acq4 ignores them.
 
 ## SFTP host keys
 

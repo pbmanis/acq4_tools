@@ -213,8 +213,16 @@ def _show_unhandled_exception(exc_type, exc, tb) -> None:
     box.exec()
 
 
+def _filter_offscreen_messages(_mode, _context, message: str) -> None:
+    """The build's self-test runs on Qt's offscreen platform, which prints a
+    harmless complaint about propagateSizeHints for every window."""
+    if "does not support propagateSizeHints" not in message:
+        print(message, file=sys.stderr)
+
+
 def self_test() -> int:
     """Open and close every tool. Used to check a packaged build."""
+    QtCore.qInstallMessageHandler(_filter_offscreen_messages)
     status = 0
     for spec in TOOLS:
         try:

@@ -60,4 +60,22 @@ TOOLS = (
         "Upload .index files that are missing from a remote system.",
         "acq4_tools.tools.index_transfer",
     ),
+    ToolSpec(
+        "default_cfg",
+        "Default Config",
+        "Edit acq4's default.cfg: modules and shortcuts, directories and options.",
+        "acq4_tools.tools.default_cfg",
+    ),
+    ToolSpec(
+        "folder_types",
+        "Folder Types",
+        "Edit acq4's folderTypes.cfg: the folders and fields offered by the Data Manager.",
+        "acq4_tools.tools.folder_types",
+    ),
+    ToolSpec(
+        "rig_config",
+        "Rig Configuration",
+        "Check a devices.cfg: DAQ wiring, optomechanical tree, and names against the acq4 source.",
+        "acq4_tools.tools.rig_config",
+    ),
 )

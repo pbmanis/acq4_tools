@@ -1,7 +1,7 @@
 """Widgets shared by the tools."""
 
 from pathlib import Path
-from typing import Optional
+from typing import Callable, Optional
 
 from pyqtgraph.Qt import QtCore, QtWidgets
 
@@ -13,18 +13,21 @@ class HistoryCombo(QtWidgets.QWidget):
 
     ``mode`` is "dir" or "file" to add a Browse button, or "text" for plain
     values such as host names. Entries are only added by ``remember()``, so a
-    tool can record a value once it has been used successfully.
+    tool can record a value once it has been used successfully. ``start_dir``
+    can name the folder that Browse should open, or return None to use the history.
     """
 
     activated = QtCore.Signal(str)
 
     def __init__(self, key: str, mode: str = "dir", title: str = "", parent=None,
-                 max_entries: int = DEFAULT_MAX_ENTRIES):
+                 max_entries: int = DEFAULT_MAX_ENTRIES,
+                 start_dir: Optional[Callable[[], Optional[str]]] = None):
         super().__init__(parent)
         self.key = key
         self.mode = mode
         self.title = title
         self.max_entries = max_entries
+        self.start_dir = start_dir
 
         layout = QtWidgets.QHBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -70,8 +73,10 @@ class HistoryCombo(QtWidgets.QWidget):
             self.refresh()
 
     def starting_dir(self) -> str:
-        """The closest existing directory to the current value."""
-        return existing_dir_from([self.text(), *history_store().get(self.key)])
+        """The folder to browse from: ``start_dir`` if it names one, otherwise
+        the closest existing directory to the current value."""
+        chosen = self.start_dir() if self.start_dir is not None else None
+        return chosen or existing_dir_from([self.text(), *history_store().get(self.key)])
 
     def browse(self) -> None:
         if self.mode == "dir":

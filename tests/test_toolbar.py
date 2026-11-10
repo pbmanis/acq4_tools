@@ -35,11 +35,10 @@ def cell(window, widget):
 
 
 def test_controls_have_their_own_row_below_the_tools(toolbar):
-    row_numbers = {cell(toolbar, b)[0] for b in toolbar.buttons.values()}
-    assert row_numbers == {0}
-    assert cell(toolbar, toolbar.status) == (1, 0)
-    assert cell(toolbar, toolbar.keep_on_top) == (1, 1)
-    assert cell(toolbar, toolbar.close_button) == (1, 2)
+    below_tools = max(cell(toolbar, b)[0] for b in toolbar.buttons.values()) + 1
+    assert cell(toolbar, toolbar.status) == (below_tools, 0)
+    assert cell(toolbar, toolbar.keep_on_top) == (below_tools, 1)
+    assert cell(toolbar, toolbar.close_button) == (below_tools, 2)
 
 
 @pytest.mark.parametrize("count,rows", [(1, 1), (8, 1), (9, 2), (16, 2), (17, 3)])
@@ -61,7 +60,7 @@ def test_items_are_equally_wide_and_stay_put_when_a_tool_opens(toolbar):
     items = [*tool_buttons, toolbar.status, toolbar.close_button]
     assert len({item.width() for item in items}) == 1
     lefts = [item.x() for item in items]
-    tool_lefts = [button.x() for button in tool_buttons]
+    tool_lefts = [button.x() for button in tool_buttons[:8]]
     assert len({b - a for a, b in zip(tool_lefts, tool_lefts[1:])}) == 1
     assert toolbar.status.x() == tool_lefts[0]
     assert toolbar.close_button.x() == tool_lefts[2]
