@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.venv/
+.mypy_cache/
+.pytest_cache/
+build/
+dist/
+.DS_Store
+
+# Pre-packaging copies of the scripts. One of them contains a server password,
+# so this directory must never be committed.
+originals/

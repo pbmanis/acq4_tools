@@ -1,0 +1,39 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "acq4-tools"
+version = "0.1.0"
+description = "Data clean-up and configuration tools to use alongside the acq4 acquisition program"
+readme = "README.md"
+authors = [{ name = "Paul Manis" }]
+requires-python = ">=3.12,<3.15"
+dependencies = [
+    "metaarray>=2.2.0",
+    "numpy>=1.26",
+    "paramiko>=3.4",
+    "pyqt6>=6.7",
+    "pyqtgraph>=0.13.7",
+    "python-dateutil>=2.8.2",
+    "tifffile>=2024.1.30",
+]
+
+[project.gui-scripts]
+acq4-tools = "acq4_tools.app:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "pytest-qt>=4.4",
+]
+build = [
+    "pyinstaller>=6.11",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/acq4_tools"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+qt_api = "pyqt6"
