@@ -1,0 +1,146 @@
+================================================================================
+Claude Code session — acq4_tools: toolbar, config editors and rig configurator
+Date: 2026-11-09 to 2026-11-10
+Project edited: /Users/pbmanis/Desktop/Python/acq4_tools
+Commits by user: f8d4921 (first commit), 33a3cd8 (The upgrades: real config files.)
+================================================================================
+
+GOAL (user requests this session)
+----------------------------------
+A suite of tools alongside acq4 for cleaning up data and configuring rigs, run
+from one floating toolbar and packaged as a single program (macOS app, Windows
+executable, Linux program) with PyInstaller. uv + pyproject.toml, tests as
+needed, all GUI in PyQt6 and pyqtgraph, no hard-coded paths (shared history
+file instead).
+
+1. Toolbar plus the existing scripts as tools. Horizontal, at most 8 tools per
+   row, equal spacing, controls in their own row, kept on top by default.
+   FITC/TRITC image directories inside a slice are valid. The day/slice tar
+   must include the .index files.
+
+2. GUI editors for default.cfg and folderTypes.cfg.
+
+3. acq4 configurator for devices.cfg: fields rather than a text editor, DAQ
+   wiring diagram, optomechanical tree with order of entry and transforms,
+   validation of lines and ports (devices may be swapped, so several may
+   name a line, just not at once), parameter names confirmed by inspecting the
+   acq4 source.
+
+
+THE TOOLS (src/acq4_tools/registry.py, in toolbar order)
+--------------------------------------------------------
+Fix Objective Scale   tools/fix_objscale.py
+Fix Directory Order   tools/fix_directory_order.py
+Directory Check       tools/dir_check.py
+Empty Index Files     tools/empty_index.py
+Day/Slice Archive     tools/day_slice_archive.py
+Index File Transfer   tools/index_transfer.py
+Default Config        tools/default_cfg.py
+Folder Types          tools/folder_types.py
+Rig Configuration     tools/rig_config.py, rig_analysis.py, device_editor.py,
+                      wiring_diagram.py
+
+
+SHARED CODE (src/acq4_tools/common/)
+------------------------------------
+config_document.py  Edits a pyqtgraph config file by changing only the lines
+                    edited, keeping comments, commented-out options and
+                    readConfigFile() includes. pyqtgraph's parser judges
+                    validity. Also: comment/uncomment whole blocks, and
+                    "## acq4_tools" annotation lines.
+config_editor.py    Window shared by the three config tools: acq4 directory,
+                    open, new from template, checks panel, save (keeps
+                    <name>.bak, asks if the file changed on disk), revert,
+                    unsaved-changes prompt.
+acq4_source.py      Parses acq4/devices with ast (never imports it) to learn
+                    each driver's keys, classes and the allowed transform keys.
+paths.py            acq4_config_dir / acq4_devices_dir accept a source checkout
+                    (<top>/config) or an install (<top>/acq4/config).
+history.py, widgets.py, tool_window.py, acq4_index.py   as named.
+
+data/: fix_objective_data.cfg, default_template.cfg, folderTypes_template.cfg,
+devices_template.cfg. Personal paths are replaced in default_template.cfg.
+
+
+RIG CONFIGURATION — what it does
+--------------------------------
+Devices tab         List of active and commented-out devices; form for each
+                    (drop-downs for driver, parent, DAQ, type, mode, free
+                    lines, True/False; typed expressions otherwise). Enable /
+                    Disable, swap with an active device of the same name, Add
+                    (blank or from the 50 acq4 examples), Remove, Up/Down,
+                    rename that follows references in the file.
+DAQ Boards          Board model per DAQ, or per board as "DAQ/Dev2". Counts
+                    editable. Stored as a comment in devices.cfg.
+Line Map            Every line on the board: free, in use, shared, alternates,
+                    not on board. Mark as Alternates, stored as a comment.
+Wiring Diagram      Colored by signal type; line style separates devices on
+                    one terminal; unshared devices move left when the stack
+                    passes about one landscape page; each port names its DAQ
+                    terminal; separate styled box per board; PDF/PNG export.
+Optomechanics       Parent tree with file order and transforms. Wrapped,
+                    top-aligned, shaded rows with a line under each.
+Parameters          Each key and whether the acq4 source uses it.
+Checks              Lines not on the board, type vs terminal, sharing (including
+                    aliases and differential pairs), device before parent or
+                    DAQ, loops, invalid transform keys, unknown drivers/keys.
+
+Annotations written to devices.cfg (acq4 ignores them):
+    ## acq4_tools board DAQ: 6259 ai=32 ao=4 port0=32 pfi=16
+    ## acq4_tools alternates: A | B
+
+
+DECISIONS
+---------
+* Tools run in the toolbar's process, imported when first opened.
+* Commented-out devices are alternates and never conflict. Two active devices on
+  a line warn until marked as alternates. acq4 itself only collides at task time.
+* Terminal aliases are resolved: /Dev1/line30, /Dev1/port0/line30, and for lines
+  past port 0, PFI names all map to one physical terminal.
+* A key is "named" if written as a string anywhere in the driver's folder (GUI
+  files read keys too); only keys appearing nowhere are warned about.
+* Palette avoids green and stays distinct from the red warning under simulated
+  protan, deutan and tritan vision (ai #1105BD, ao #2C8496, di #711174,
+  do #D806F9, trigger #222222, problem #C00000). Checked with a Python port of
+  the checks because Node was not installed.
+* Build self-test filters Qt's harmless propagateSizeHints message.
+
+
+FINDINGS ABOUT ACQ4
+-------------------
+* Docs say transform "position"; OptomechDevice.setDeviceTransform accepts only
+  pos, scale, angle, axis and raises otherwise.
+* A device defined before its parent is left unconnected: acq4 prints a message
+  and carries on.
+* Keys in the example devices.cfg that appear nowhere in the acq4 code:
+  pulseRate, calibrationDir, shutterLasers, scope, scopeDevice. Imager reads no
+  "attenuator" key although the example default.cfg sets one.
+* pyqtgraph cannot read an empty section at the end of a file, so the editors
+  write {} until a section has keys.
+
+
+VERIFICATION
+------------
+* 355 tests pass (QT_QPA_PLATFORM=offscreen).
+* macOS app builds and --self-test opens all 9 tools.
+* All example configs and config/devices.cfg load with text unchanged.
+* In memory: disable/enable returns the exact text for all 18 active devices in
+  the two devices.cfg files; all 76 commented-out blocks enable and parse.
+* Read-only run on a real day directory: no flags, PDF built, archive correct.
+
+
+NOT VERIFIED / TO CHECK AT THE RIG
+----------------------------------
+* NI board line counts in rig_analysis.py were entered from memory, not from
+  datasheets. Compare with the actual boards.
+* Two-board wiring has only been tried on a made-up file.
+* No file saved by these tools has been loaded into acq4 itself.
+* Windows only seen via offscreen renders on macOS: real-screen dialogs, form
+  editing and Cmd-Q have not been exercised. Windows and Linux builds not run.
+* Index File Transfer not run against a real server.
+* Dark-mode shading of the Optomechanics rows not rendered.
+* Renames do not update default.cfg or references inside commented-out devices.
+
+originals/ (git-ignored) holds the pre-packaging scripts and one contains a
+server credential: never commit it.
+================================================================================
