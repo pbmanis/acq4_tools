@@ -39,10 +39,12 @@ PyInstaller cannot cross-compile, so build on the platform you are targeting:
 | --- | --- | --- |
 | macOS | `packaging/build_macos.sh` | `dist/acq4 Tools.app` |
 | Linux | `packaging/build_linux.sh` | `dist/acq4-tools/acq4-tools` |
-| Windows | `packaging\build_windows.ps1` | `dist\acq4-tools\acq4-tools.exe` |
+| Windows (Git Bash) | `packaging/build_windows.sh` | `dist/acq4-tools/acq4-tools.exe` |
 
 Each script finishes by running the built program's `--self-test`, which opens
 and closes every tool.
+
+The PowerShell equivalent is also available as `packaging\build_windows.ps1`.
 
 ## Where settings are kept
 
