@@ -16,6 +16,14 @@ several tools can be open at once.
 | Retrieve .index Files | Upload `.index` files that are missing from a remote system over SFTP. Never overwrites. |
 | Day/Slice Archive | Make a tar file of the day and slice levels of the data, including each day's `.index` and the slices' label directories, without the cells. |
 
+## Help
+
+Every tool window has a **Help** menu (F1, or Cmd-? on macOS) that opens the
+tool's page in a small built-in help browser, and the toolbar's **Help** button
+opens the overview. The pages are Markdown files in `src/acq4_tools/docs/`,
+packaged with the application, so no network connection or web browser is
+needed. Every button has a tooltip.
+
 ## Running from source
 
 ```
@@ -74,8 +82,10 @@ Connect once with `ssh user@host` and accept the key before using it.
 ## Adding a tool
 
 Write a module in `src/acq4_tools/tools/` with a `create_tool()` function that
-returns a `ToolWindow`, then add a `ToolSpec` entry to
-`src/acq4_tools/registry.py`.
+returns a `ToolWindow`, add a `ToolSpec` entry to
+`src/acq4_tools/registry.py`, and write its help page as
+`src/acq4_tools/docs/<key>.md`, starting with `# <title>`. The tests check
+that the page exists and that every button has a tooltip.
 
 ## License
 
