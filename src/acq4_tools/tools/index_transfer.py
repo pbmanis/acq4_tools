@@ -145,14 +145,20 @@ class IndexTransferWindow(ToolWindow):
         self.port = QtWidgets.QSpinBox()
         self.port.setRange(1, 65535)
         self.port.setValue(22)
+        self.port.setToolTip("The SSH port of the remote host (normally 22).")
         form.addRow("Port:", self.port)
         self.username = HistoryCombo("index_transfer.username", mode="text")
         form.addRow("User name:", self.username)
         self.password = QtWidgets.QLineEdit()
         self.password.setEchoMode(QtWidgets.QLineEdit.EchoMode.Password)
         self.password.setPlaceholderText("Not saved")
+        self.password.setToolTip("Used only while connected, and never saved.")
         form.addRow("Password:", self.password)
         self.remote_root = HistoryCombo("index_transfer.remote_root", mode="text")
+        self.remote_root.setToolTip(
+            "The remote directory that holds the day directories (the remote "
+            "counterpart of the local directory)."
+        )
         form.addRow("Remote directory:", self.remote_root)
         layout.addLayout(form)
 
@@ -171,14 +177,24 @@ class IndexTransferWindow(ToolWindow):
 
         buttons = QtWidgets.QHBoxLayout()
         self.list_button = QtWidgets.QPushButton("List day directories")
+        self.list_button.setToolTip("List the day directories in the local directory.")
         self.list_button.clicked.connect(self.list_days)
         self.check_button = QtWidgets.QPushButton("Check remote")
+        self.check_button.setToolTip(
+            "Connect and find which .index files of the ticked days are missing on "
+            "the remote host. Nothing is changed."
+        )
         self.check_button.clicked.connect(self.check_remote)
         self.upload_button = QtWidgets.QPushButton("Upload missing…")
         self.upload_button.setEnabled(False)
+        self.upload_button.setToolTip(
+            "Upload the .index files found missing. Existing remote files are never "
+            "overwritten."
+        )
         self.upload_button.clicked.connect(self.upload)
         self.cancel_button = QtWidgets.QPushButton("Cancel")
         self.cancel_button.setEnabled(False)
+        self.cancel_button.setToolTip("Stop after the current file.")
         self.cancel_button.clicked.connect(self.cancel)
         for button in (self.list_button, self.check_button, self.upload_button, self.cancel_button):
             buttons.addWidget(button)

@@ -25,8 +25,9 @@ import pyqtgraph.dockarea as PGD
 import tifffile  # acq4 image (.tif) reader
 from pyqtgraph import configfile
 from pyqtgraph.parametertree import Parameter, ParameterTree
-from pyqtgraph.Qt import QtCore, QtWidgets
+from pyqtgraph.Qt import QtCore, QtGui, QtWidgets
 
+from acq4_tools.common.help import help_page, show_help
 from acq4_tools.common.history import history_store
 from acq4_tools.common.paths import config_dir, packaged_data
 from acq4_tools.common.tool_window import ToolWindow
@@ -714,14 +715,17 @@ class FixObjective:
         recent_value = list(recent_limits.values())[0]
         self.params = [
             # {"name": "Pick Cell", "type": "list", "values": cellvalues, "value": cellvalues[0]},
-            {"name": "Set Directory/Protocol", "type": "action"},
-            {"name": "Reload Last Protocol", "type": "action"},
+            {"name": "Set Directory/Protocol", "type": "action",
+             "tip": "Choose a directory that holds images or videos and an .index file."},
+            {"name": "Reload Last Protocol", "type": "action",
+             "tip": "Open the most recently used directory again."},
             {
                 "name": "Recent",
                 "type": "list",
                 "limits": recent_limits,
                 "value": recent_value,
                 "renamable": False,
+                "tip": "Directories opened before. Choose one to open it.",
             },
             # Three entry points now - an explicit recent_path
             {
@@ -730,15 +734,19 @@ class FixObjective:
                 "limits": ["(none)"],
                 "value": "(none)",
                 "renamable": False,
+                "tip": "The image or video to show. Changes apply to this file only.",
             },
-            {"name": "Images", "type": "str", "value": ""},
-            {"name": "Videos", "type": "str", "value": ""},
+            {"name": "Images", "type": "str", "value": "",
+             "tip": "Not used at present: changes apply to the file shown."},
+            {"name": "Videos", "type": "str", "value": "",
+             "tip": "Not used at present: changes apply to the file shown."},
             {
                 "name": "Camera",
                 "type": "list",
                 "limits": cameras,
                 "value": cameras[0],
                 "renamable": False,
+                "tip": "The camera the data were taken with; its pixel size sets the scale.",
             },
             {
                 "name": "Cine Scale",
@@ -746,6 +754,7 @@ class FixObjective:
                 "limits": cinescales,
                 "value": cinescales[0],
                 "readonly": True,
+                "tip": "Magnification of the coupler between camera and microscope.",
             },
             {
                 "name": "Original Objective",
@@ -753,6 +762,7 @@ class FixObjective:
                 "limits": objectives,
                 "value": objectives[0],
                 "renamable": False,
+                "tip": "The objective recorded in the .index for the file shown.",
             },
             {
                 "name": "New Objective",
@@ -760,17 +770,25 @@ class FixObjective:
                 "limits": objectives,
                 "value": objectives[1],
                 "renamable": False,
+                "tip": "The objective actually used. The scale is recalculated from it.",
             },
-            {"name": "View .index", "type": "action"},
-            {"name": "View proposed changes", "type": "action"},
-            {"name": "Apply changes", "type": "action"},
-            {'name': "Reload", 'type': 'action'},
-            {"name": "Quit", "type": "action"},
+            {"name": "View .index", "type": "action",
+             "tip": "Show the .index entries for the images and videos in this directory."},
+            {"name": "View proposed changes", "type": "action",
+             "tip": "Show the new scale for the file shown. Nothing is written."},
+            {"name": "Apply changes", "type": "action",
+             "tip": "Write the new objective and scale for the file shown into the .index."},
+            {'name': "Reload", 'type': 'action', "tip": "Not connected yet: does nothing."},
+            {"name": "Quit", "type": "action", "tip": "Close this tool."},
         ]
         self.ptree = ParameterTree()
         self.ptreedata = Parameter.create(name="Commands", type="group", children=self.params)
 
         self.ptree.setParameters(self.ptreedata)
+        for item in self.ptree.listAllItems():
+            button = getattr(item, "defaultBtn", None)
+            if button is not None:
+                button.setToolTip("Restore the default value.")
         # Keep a handle to the Recent dropdown so it can be
         # refreshed as the most-recent stack changes.
         self._recent_param = self.ptreedata.param("Recent")
@@ -890,9 +908,9 @@ class FixObjective:
         self.Dock_Changes.addWidget(self.change_text)
 
         self.Dock_Help = PGD.Dock("Help", size=(win_wid - self.ptreewid, 320))
-        self.help_text = QtWidgets.QTextEdit()
-        self.help_text.setReadOnly(True)
-        self.help_text.setText("Help")
+        self.help_text = QtWidgets.QTextBrowser()
+        self.help_text.setOpenLinks(False)
+        self.help_text.anchorClicked.connect(lambda url: show_help(Path(url.path()).stem))
         self.Dock_Help.addWidget(self.help_text)
 
         self.DockArea.addDock(self.Dock_Params, "left")
@@ -923,25 +941,12 @@ class FixObjective:
         self.win.close()
 
     def put_help(self):
-        help_text = """
-        <h1>Fix Objective</h1>
-        <p>This tool is used to correct the objective scale factor in the .index file for a set of images or videos.</p>
-        <p>First select the directory that holds the image data you wish to correct by selecting the 'Set Directory/Protocol' button.</p>
-        <p>When you have selected this directory, the 'Reporting' window should show the .index file data entries for the images and videos in the directory.</p>
-        <p>Identify the images and videos you want to change by using the 'seqparse' format of the corresponding numbers in the 'Images' and 'Videos' fields.</p>
-        <p> For example, if you want to change images 1, 2, and 3, you would enter '1;3' in the 'Images' field.
-        if you wnat to change images 1, 3, and 5, enter '1,3,5' in the image field. Note that the image and video numbers start at 0.
-        </p>
-        <p> You can then view the proposed changes by selecting the 'View proposed changes' button.</p>
-        <p>It is also important to select the correct objective for the data you are working with.</p>
-        <p>Once you have selected the camera, cine scale, and the images or videos you wish to correct, you can select the new objective and apply the changes.</p>
-        <p> If you are satisfied with the changes, you can apply them by selecting the 'Apply changes' button.</p>
-        <p>It is important to select the correct camera and cine scale for the data you are working with.</p>
-        <p>It is important to note that the changes are not reversible, so be sure you have selected the correct data and the correct objective before applying the changes.</p>
-        <p>Once you have applied the changes, you can view the changes in the .index file by selecting the 'View .index' button.</p>
-        <p>Once you have applied the changes, you can quit the program by selecting the 'Quit' button.</p>
-        """
-        self.help_text.setHtml(help_text)
+        """Show this tool's page from the documentation (also in Help > Objective Scale Help)."""
+        self.help_text.setSource(
+            QtCore.QUrl.fromLocalFile(str(help_page("fix_objscale"))),
+            QtGui.QTextDocument.ResourceType.MarkdownResource,
+        )
+
 
 def create_tool() -> ToolWindow:
     tool = FixObjective(objective_data=load_objective_data())

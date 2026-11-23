@@ -367,23 +367,31 @@ class DirCheckWindow(ToolWindow):
         self.top_dir = HistoryCombo("dir_check.top_dir", title="Directory to check")
         form.addRow("Directory to check:", self.top_dir)
         self.after = QtWidgets.QLineEdit("1970.1.1")
+        self.after.setToolTip("Skip days before this date (year.month.day).")
         form.addRow("On or after:", self.after)
         self.before = QtWidgets.QLineEdit("2266.1.1")
+        self.before.setToolTip("Skip days after this date (year.month.day).")
         form.addRow("On or before:", self.before)
         self.show_protocol = QtWidgets.QCheckBox(
             "Include protocol information (very verbose)"
         )
+        self.show_protocol.setToolTip("Print each protocol's .index contents in the report.")
         form.addRow("", self.show_protocol)
         layout.addLayout(form)
 
         buttons = QtWidgets.QHBoxLayout()
         self.run_button = QtWidgets.QPushButton("Run check")
+        self.run_button.setToolTip("Check the directory and list what is found. Nothing is changed.")
         self.run_button.clicked.connect(self.start_check)
         self.cancel_button = QtWidgets.QPushButton("Cancel")
         self.cancel_button.setEnabled(False)
+        self.cancel_button.setToolTip("Stop the check.")
         self.cancel_button.clicked.connect(self.cancel_check)
         self.save_button = QtWidgets.QPushButton("Save report…")
         self.save_button.setEnabled(False)
+        self.save_button.setToolTip(
+            "Save the report as text, or as LaTeX (made into a PDF when pdflatex is installed)."
+        )
         self.save_button.clicked.connect(self.save_report)
         for button in (self.run_button, self.cancel_button, self.save_button):
             buttons.addWidget(button)

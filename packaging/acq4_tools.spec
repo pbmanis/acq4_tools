@@ -20,6 +20,7 @@ analysis = Analysis(
     pathex=[str(source)],
     datas=[
         (str(source / "acq4_tools" / "data"), "acq4_tools/data"),
+        (str(source / "acq4_tools" / "docs"), "acq4_tools/docs"),
         *collect_data_files("pyqtgraph", includes=["colors/maps/*", "icons/**/*"]),
     ],
     # The toolbar imports each tool by name when its button is pressed.

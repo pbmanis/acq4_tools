@@ -896,18 +896,31 @@ class FixDirectoryOrder:
         btn_box = QtWidgets.QVBoxLayout()
         btn_box.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
         self.btn_browse = QtWidgets.QPushButton("Browse…")
+        self.btn_browse.setToolTip(
+            "Choose a day directory, or a directory inside one, or a folder of days "
+            "(the earliest is shown)."
+        )
         self.btn_browse.clicked.connect(self.browse_for_day)
         self.btn_prev = QtWidgets.QPushButton("Previous day")
+        self.btn_prev.setToolTip("Show the day before this one in the same folder.")
         self.btn_prev.clicked.connect(self.go_prev_day)
         self.btn_next = QtWidgets.QPushButton("Next day")
+        self.btn_next.setToolTip("Show the day after this one in the same folder.")
         self.btn_next.clicked.connect(self.go_next_day)
         self.btn_reload = QtWidgets.QPushButton("Reload current structure")
+        self.btn_reload.setToolTip(
+            "Read the day again, for example after making changes in acq4's Data Manager."
+        )
         self.btn_reload.clicked.connect(self.reload_structure)
         for b in (self.btn_browse, self.btn_prev, self.btn_next, self.btn_reload):
             btn_box.addWidget(b)
         # Default (unticked): a cell's protocol dirs differing only in name order
         # vs time order is NOT treated as needing a change. Tick to flag those.
         self.flag_order_cb = QtWidgets.QCheckBox("Flag protocol order\n(name vs time)")
+        self.flag_order_cb.setToolTip(
+            "Also flag a cell's protocols whose name order differs from the order "
+            "in which they were recorded."
+        )
         self.flag_order_cb.toggled.connect(self._on_toggle_order_mode)
         btn_box.addWidget(self.flag_order_cb)
         btn_box.addStretch(1)
@@ -918,6 +931,7 @@ class FixDirectoryOrder:
         recent_box.addWidget(QtWidgets.QLabel("Recent day directories:"))
         self.recent_list = QtWidgets.QListWidget()
         self.recent_list.setMinimumHeight(120)
+        self.recent_list.setToolTip("Click a day to show it again.")
         self.recent_list.itemClicked.connect(self.load_recent)
         recent_box.addWidget(self.recent_list)
         top_layout.addLayout(recent_box, stretch=1)

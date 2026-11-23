@@ -110,15 +110,28 @@ class DeviceEditor(QtWidgets.QWidget):
         layout.addWidget(self.table, stretch=1)
 
         self.toggle_button = QtWidgets.QPushButton("Disable")
-        self.toggle_button.setToolTip("Comment the device out of the file, or bring it back.")
+        self.toggle_button.setToolTip(
+            "Comment the device out of the file (Disable), or bring a commented-out "
+            "device back (Enable), swapping out an active device of the same name."
+        )
         self.toggle_button.clicked.connect(self.toggle_enabled)
         add = QtWidgets.QPushButton("Add…")
+        add.setToolTip("Add a device, blank or copied from one of acq4's examples.")
         add.clicked.connect(self.add_device_from_dialog)
         self.remove_button = QtWidgets.QPushButton("Remove")
+        self.remove_button.setToolTip(
+            "Delete the selected device from the file. To keep it, use Disable instead."
+        )
         self.remove_button.clicked.connect(self.remove_device)
         self.up_button = QtWidgets.QPushButton("Up")
+        self.up_button.setToolTip(
+            "Move the device earlier in the file. acq4 loads devices in file order."
+        )
         self.up_button.clicked.connect(lambda: self.move_device(-1))
         self.down_button = QtWidgets.QPushButton("Down")
+        self.down_button.setToolTip(
+            "Move the device later in the file. acq4 loads devices in file order."
+        )
         self.down_button.clicked.connect(lambda: self.move_device(1))
         layout.addLayout(_button_row(self.toggle_button, add, self.remove_button,
                                      self.up_button, self.down_button))
@@ -130,6 +143,9 @@ class DeviceEditor(QtWidgets.QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         form = QtWidgets.QFormLayout()
         self.name_edit = QtWidgets.QLineEdit()
+        self.name_edit.setToolTip(
+            "Rename the device. References to it elsewhere in this file follow."
+        )
         self.name_edit.editingFinished.connect(self._on_name_finished)
         form.addRow("Device name:", self.name_edit)
         layout.addLayout(form)
@@ -142,10 +158,19 @@ class DeviceEditor(QtWidgets.QWidget):
         self.note = QtWidgets.QLabel()
         layout.addWidget(self.note)
         self.add_setting_button = QtWidgets.QPushButton("Add Setting…")
+        self.add_setting_button.setToolTip(
+            "Add a setting to the device, or to the selected section. The list offers "
+            "the keys the driver reads in the acq4 source."
+        )
         self.add_setting_button.clicked.connect(self.add_setting_from_dialog)
         self.add_channel_button = QtWidgets.QPushButton("Add DAQ Channel…")
+        self.add_channel_button.setToolTip(
+            "Add an analog-input (ai) channel on the first DAQ's first free ai line. "
+            "Change its type and line in the form afterwards."
+        )
         self.add_channel_button.clicked.connect(self.add_channel_from_dialog)
         self.remove_setting_button = QtWidgets.QPushButton("Remove Setting")
+        self.remove_setting_button.setToolTip("Remove the selected setting or section.")
         self.remove_setting_button.clicked.connect(self.remove_setting)
         layout.addLayout(_button_row(self.add_setting_button, self.add_channel_button,
                                      self.remove_setting_button))

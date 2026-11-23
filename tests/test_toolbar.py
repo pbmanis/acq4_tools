@@ -39,6 +39,7 @@ def test_controls_have_their_own_row_below_the_tools(toolbar):
     assert cell(toolbar, toolbar.status) == (below_tools, 0)
     assert cell(toolbar, toolbar.keep_on_top) == (below_tools, 1)
     assert cell(toolbar, toolbar.close_button) == (below_tools, 2)
+    assert cell(toolbar, toolbar.help_button) == (below_tools, 3)
 
 
 @pytest.mark.parametrize("count,rows", [(1, 1), (6, 1), (7, 2), (12, 2), (13, 3)])
@@ -50,7 +51,7 @@ def test_tools_wrap_after_six(qtbot, count, rows):
     assert max(c[1] for c in cells) <= 5
     assert cells[-1] == ((count - 1) // 6, (count - 1) % 6)
     assert cell(window, window.status) == (rows, 0)
-    assert window.grid.columnCount() == max(min(count, 6), 3)
+    assert window.grid.columnCount() == max(min(count, 6), 4)
 
 
 def test_items_are_equally_wide_and_stay_put_when_a_tool_opens(toolbar):

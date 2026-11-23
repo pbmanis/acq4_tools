@@ -133,9 +133,14 @@ class DaySliceArchiveWindow(ToolWindow):
 
         buttons = QtWidgets.QHBoxLayout()
         self.make_button = QtWidgets.QPushButton("Make tar file…")
+        self.make_button.setToolTip(
+            "Choose where to save, then write a tar file of the days and slices "
+            "(without the cells). The data are only read."
+        )
         self.make_button.clicked.connect(self.start_archive)
         self.cancel_button = QtWidgets.QPushButton("Cancel")
         self.cancel_button.setEnabled(False)
+        self.cancel_button.setToolTip("Stop. No tar file is left behind.")
         self.cancel_button.clicked.connect(self.cancel_archive)
         buttons.addWidget(self.make_button)
         buttons.addWidget(self.cancel_button)

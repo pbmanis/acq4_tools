@@ -58,8 +58,13 @@ class ConfigEditorWindow(ToolWindow):
         self.file_combo.activated.connect(lambda _text: self.open_file())
         file_grid.addWidget(self.file_combo, 1, 1)
         self.open_button = QtWidgets.QPushButton("Open")
+        self.open_button.setToolTip("Open the file named on the left.")
         self.open_button.clicked.connect(lambda: self.open_file())
         self.template_button = QtWidgets.QPushButton("New from Template")
+        self.template_button.setToolTip(
+            "Start a new, untitled file from the template shipped with acq4 Tools. "
+            "Nothing is written until you save."
+        )
         self.template_button.clicked.connect(lambda: self.new_from_template())
         file_grid.addWidget(self.open_button, 1, 2)
         file_grid.addWidget(self.template_button, 1, 3)
@@ -81,10 +86,15 @@ class ConfigEditorWindow(ToolWindow):
         button_row = QtWidgets.QHBoxLayout()
         button_row.addStretch(1)
         self.revert_button = QtWidgets.QPushButton("Revert")
+        self.revert_button.setToolTip("Discard every change made since the file was opened or saved.")
         self.revert_button.clicked.connect(self.revert)
         self.save_as_button = QtWidgets.QPushButton("Save As…")
+        self.save_as_button.setToolTip("Save to a new file.")
         self.save_as_button.clicked.connect(lambda: self.save_as())
         self.save_button = QtWidgets.QPushButton("Save")
+        self.save_button.setToolTip(
+            "Save the file. The previous version is kept beside it as <name>.bak."
+        )
         self.save_button.clicked.connect(lambda: self.save())
         for button in (self.revert_button, self.save_as_button, self.save_button):
             button_row.addWidget(button)

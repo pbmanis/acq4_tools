@@ -1,13 +1,15 @@
 """The tools the toolbar offers.
 
 Each tool module is imported the first time its button is pressed, which keeps
-the toolbar quick to start. To add a tool, add a ToolSpec here and give its
-module a ``create_tool()`` function that returns a ToolWindow.
+the toolbar quick to start. To add a tool, add a ToolSpec here, give its
+module a ``create_tool()`` function that returns a ToolWindow, and write its
+help page as docs/<key>.md.
 """
 
 import importlib
 from dataclasses import dataclass
 
+from acq4_tools.common.help import add_help_menu
 from acq4_tools.common.tool_window import ToolWindow
 
 
@@ -19,7 +21,9 @@ class ToolSpec:
     module: str
 
     def create(self) -> ToolWindow:
-        return importlib.import_module(self.module).create_tool()
+        window = importlib.import_module(self.module).create_tool()
+        add_help_menu(window, self.key, self.title)
+        return window
 
 
 TOOLS = (

@@ -8,7 +8,7 @@ from pyqtgraph.Qt import QtCore, QtWidgets
 
 from acq4_tools.common.config_document import ConfigDocument, Node
 from acq4_tools.common.config_editor import ConfigEditorWindow
-from acq4_tools.tools.default_cfg import _button_column, _read_only_item
+from acq4_tools.tools.default_cfg import _button_column, _read_only_item, _set_tips
 
 # The field types in acq4.modules.DataManager.FileInfoView.
 FIELD_TYPES = ("string", "text", "list", "bool")
@@ -140,11 +140,16 @@ class FolderTypesWindow(ConfigEditorWindow):
         self.type_list.itemChanged.connect(self._on_type_renamed)
         layout.addWidget(self.type_list, stretch=1)
         row = QtWidgets.QHBoxLayout()
-        for text, handler in (
-            ("Add", self.add_type), ("Remove", self.remove_type),
-            ("Up", lambda: self.move_type(-1)), ("Down", lambda: self.move_type(1)),
+        for text, handler, tip in (
+            ("Add", self.add_type, "Add a folder type."),
+            ("Remove", self.remove_type, "Remove the selected folder type."),
+            ("Up", lambda: self.move_type(-1),
+             "Move the selected folder type up in the Data Manager's menu."),
+            ("Down", lambda: self.move_type(1),
+             "Move the selected folder type down in the Data Manager's menu."),
         ):
             button = QtWidgets.QPushButton(text)
+            button.setToolTip(tip)
             button.clicked.connect(handler)
             row.addWidget(button)
         layout.addLayout(row)
@@ -164,6 +169,10 @@ class FolderTypesWindow(ConfigEditorWindow):
         self.name_preview = QtWidgets.QLabel()
         self.experimental_unit = QtWidgets.QCheckBox(
             "Experimental unit (one log file is kept for each folder)"
+        )
+        self.experimental_unit.setToolTip(
+            "acq4 keeps a separate log for each folder of an experimental-unit type, "
+            "such as a cell."
         )
         self.experimental_unit.clicked.connect(self._on_experimental_unit)
         form.addRow("Name format:", self.name_edit)
@@ -187,6 +196,12 @@ class FolderTypesWindow(ConfigEditorWindow):
         self.fields_table.itemSelectionChanged.connect(self._fill_values)
         row.addWidget(self.fields_table, stretch=1)
         add, remove, up, down = (QtWidgets.QPushButton(t) for t in ("Add", "Remove", "Up", "Down"))
+        _set_tips((add, remove, up, down), (
+            "Add a metadata field to this folder type.",
+            "Remove the selected field.",
+            "Move the selected field up in the Data Manager's form.",
+            "Move the selected field down in the Data Manager's form.",
+        ))
         add.clicked.connect(self.add_field)
         remove.clicked.connect(self.remove_field)
         up.clicked.connect(lambda: self.move_field(-1))
@@ -203,6 +218,12 @@ class FolderTypesWindow(ConfigEditorWindow):
         self.values_list.itemChanged.connect(lambda _item: self._store_values())
         row.addWidget(self.values_list, stretch=1)
         add, remove, up, down = (QtWidgets.QPushButton(t) for t in ("Add", "Remove", "Up", "Down"))
+        _set_tips((add, remove, up, down), (
+            "Add a choice to the selected list field.",
+            "Remove the selected choice.",
+            "Move the selected choice up.",
+            "Move the selected choice down.",
+        ))
         add.clicked.connect(self.add_value)
         remove.clicked.connect(self.remove_value)
         up.clicked.connect(lambda: self.move_value(-1))

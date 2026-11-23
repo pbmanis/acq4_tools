@@ -193,6 +193,11 @@ def _read_only_item(text: str) -> QtWidgets.QTableWidgetItem:
     return item
 
 
+def _set_tips(buttons, tips) -> None:
+    for button, tip in zip(buttons, tips):
+        button.setToolTip(tip)
+
+
 def _button_column(*buttons) -> QtWidgets.QVBoxLayout:
     column = QtWidgets.QVBoxLayout()
     for button in buttons:
@@ -239,6 +244,12 @@ class DefaultConfigWindow(ConfigEditorWindow):
         self.modules_table.itemSelectionChanged.connect(self._fill_settings)
         row.addWidget(self.modules_table, stretch=1)
         add, remove, up, down = (QtWidgets.QPushButton(t) for t in ("Add", "Remove", "Up", "Down"))
+        _set_tips((add, remove, up, down), (
+            "Add a module entry, which you can then rename and give a module class.",
+            "Remove the selected module and its settings.",
+            "Move the selected module up in the file (and in acq4's module list).",
+            "Move the selected module down in the file (and in acq4's module list).",
+        ))
         add.clicked.connect(self.add_module)
         remove.clicked.connect(self.remove_module)
         up.clicked.connect(lambda: self.move_module(-1))
@@ -258,10 +269,13 @@ class DefaultConfigWindow(ConfigEditorWindow):
         self.settings_table.itemChanged.connect(self._on_setting_item_changed)
         row.addWidget(self.settings_table, stretch=1)
         add = QtWidgets.QPushButton("Add Setting")
+        add.setToolTip("Add a setting to the selected module's config section.")
         add.clicked.connect(self.add_setting)
         remove = QtWidgets.QPushButton("Remove Setting")
+        remove.setToolTip("Remove the selected setting.")
         remove.clicked.connect(self.remove_setting)
         browse = QtWidgets.QPushButton("Choose Directory…")
+        browse.setToolTip("Set the selected setting to a directory chosen from a dialog.")
         browse.clicked.connect(self.choose_setting_directory)
         row.addLayout(_button_column(add, remove, browse))
         layout.addWidget(self.settings_group, stretch=2)
@@ -276,6 +290,7 @@ class DefaultConfigWindow(ConfigEditorWindow):
         row.addWidget(edit, stretch=1)
         if browse == "dir":
             button = QtWidgets.QPushButton("Browse…")
+            button.setToolTip("Choose a directory.")
             button.clicked.connect(lambda: self._browse_into(edit))
             row.addWidget(button)
         form.addRow(label, row)
@@ -325,10 +340,13 @@ class DefaultConfigWindow(ConfigEditorWindow):
         self.configurations_table.itemChanged.connect(self._on_configuration_item_changed)
         row.addWidget(self.configurations_table, stretch=1)
         add = QtWidgets.QPushButton("Add")
+        add.setToolTip("Add a named configuration with its own storage directory.")
         add.clicked.connect(self.add_configuration)
         remove = QtWidgets.QPushButton("Remove")
+        remove.setToolTip("Remove the selected configuration.")
         remove.clicked.connect(self.remove_configuration)
         browse = QtWidgets.QPushButton("Choose Directory…")
+        browse.setToolTip("Choose the storage directory of the selected configuration.")
         browse.clicked.connect(self.choose_configuration_directory)
         row.addLayout(_button_column(add, remove, browse))
         layout.addWidget(group, stretch=1)

@@ -8,6 +8,7 @@ from typing import Optional, Sequence
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtWidgets
 
+from acq4_tools.common.help import close_help, help_page, show_help
 from acq4_tools.common.history import history_store
 from acq4_tools.common.tool_window import ToolWindow, workers_still_running
 from acq4_tools.registry import TOOLS, ToolSpec
@@ -49,12 +50,18 @@ class ToolbarWindow(QtWidgets.QWidget):
         keep_on_top = bool(history_store().get_setting(_KEEP_ON_TOP, True))
         self.keep_on_top = QtWidgets.QCheckBox("Keep on top")
         self.keep_on_top.setChecked(keep_on_top)
+        self.keep_on_top.setToolTip("Keep this toolbar above other windows.")
         self.keep_on_top.toggled.connect(self._on_keep_on_top)
 
         self.status = QtWidgets.QLabel()
         self.status.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
 
+        self.help_button = QtWidgets.QPushButton("Help")
+        self.help_button.setToolTip("Open the documentation for the tools.")
+        self.help_button.clicked.connect(lambda: show_help())
+
         self.close_button = QtWidgets.QPushButton("Close")
+        self.close_button.setToolTip("Close every tool and quit.")
         self.close_button.clicked.connect(self.close)
 
         # The controls have their own row below the tools.
@@ -62,6 +69,7 @@ class ToolbarWindow(QtWidgets.QWidget):
         self.grid.addWidget(self.status, row, 0)
         self.grid.addWidget(self.keep_on_top, row, 1, QtCore.Qt.AlignmentFlag.AlignHCenter)
         self.grid.addWidget(self.close_button, row, 2)
+        self.grid.addWidget(self.help_button, row, 3)
         self._equalize_columns()
 
         self._apply_on_top(keep_on_top)
@@ -76,6 +84,7 @@ class ToolbarWindow(QtWidgets.QWidget):
         widths = [
             self.keep_on_top.sizeHint().width(),
             self.close_button.sizeHint().width(),
+            self.help_button.sizeHint().width(),
             self.status.fontMetrics().horizontalAdvance("10 tool(s) open"),
         ]
         for spec in self.tools:
@@ -186,6 +195,7 @@ class ToolbarWindow(QtWidgets.QWidget):
             event.ignore()
             return
         self._quit_confirmed = True
+        close_help()
         history_store().set_setting(
             _GEOMETRY, bytes(self.saveGeometry().toBase64()).decode("ascii")
         )
@@ -226,11 +236,14 @@ def _filter_offscreen_messages(_mode, _context, message: str) -> None:
 
 
 def self_test() -> int:
-    """Open and close every tool. Used to check a packaged build."""
+    """Open and close every tool, and check that its help page was packaged.
+    Used to check a packaged build."""
     QtCore.qInstallMessageHandler(_filter_offscreen_messages)
     status = 0
     for spec in TOOLS:
         try:
+            if not help_page(spec.key).is_file():
+                raise FileNotFoundError(f"no help page at {help_page(spec.key)}")
             window = spec.create()
             window.show()
             QtWidgets.QApplication.processEvents()

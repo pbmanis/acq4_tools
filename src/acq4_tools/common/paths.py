@@ -56,3 +56,8 @@ def acq4_devices_dir(top: str) -> Optional[Path]:
 def packaged_data(name: str) -> Path:
     """Return the path of a file shipped in the package's data directory."""
     return Path(__file__).resolve().parent.parent / "data" / name
+
+
+def packaged_docs() -> Path:
+    """Return the directory of the user documentation shipped with the package."""
+    return Path(__file__).resolve().parent.parent / "docs"

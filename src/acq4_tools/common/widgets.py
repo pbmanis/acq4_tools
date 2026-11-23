@@ -41,10 +41,12 @@ class HistoryCombo(QtWidgets.QWidget):
             QtWidgets.QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon
         )
         self.combo.setMinimumContentsLength(30)
+        self.combo.setToolTip("Type a value, or pick a recent one from the list.")
         self.combo.activated.connect(self._on_activated)
         layout.addWidget(self.combo, stretch=1)
         if mode in ("dir", "file"):
             browse = QtWidgets.QPushButton("Browse…")
+            browse.setToolTip(f"Choose a {'directory' if mode == 'dir' else 'file'}.")
             browse.clicked.connect(self.browse)
             layout.addWidget(browse)
         self.refresh()

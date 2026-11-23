@@ -167,8 +167,15 @@ class RigConfigWindow(ConfigEditorWindow):
             "Devices that share a line but are never used together can be marked as alternates."
         ), stretch=1)
         self.mark_button = QtWidgets.QPushButton("Mark as Alternates")
+        self.mark_button.setToolTip(
+            "Record that the devices on the selected shared line are never used "
+            "together, so the sharing is not reported."
+        )
         self.mark_button.clicked.connect(self.mark_alternates)
         self.unmark_button = QtWidgets.QPushButton("Clear Mark")
+        self.unmark_button.setToolTip(
+            "Remove the alternates mark from the devices on the selected line."
+        )
         self.unmark_button.clicked.connect(self.clear_alternates)
         row.addWidget(self.mark_button)
         row.addWidget(self.unmark_button)
@@ -185,12 +192,17 @@ class RigConfigWindow(ConfigEditorWindow):
         layout.addWidget(self.diagram_view, stretch=1)
         row = QtWidgets.QHBoxLayout()
         self.include_commented = QtWidgets.QCheckBox("Include commented-out devices")
+        self.include_commented.setToolTip(
+            "Also draw the commented-out devices (alternates), in gray."
+        )
         self.include_commented.toggled.connect(lambda _on: self._draw_diagram())
         row.addWidget(self.include_commented)
         row.addStretch(1)
         fit = QtWidgets.QPushButton("Fit")
+        fit.setToolTip("Zoom to show the whole diagram.")
         fit.clicked.connect(self._fit_diagram)
         export = QtWidgets.QPushButton("Export…")
+        export.setToolTip("Save the diagram as a PDF (one page) or a PNG image.")
         export.clicked.connect(lambda: self.export_diagram())
         row.addWidget(fit)
         row.addWidget(export)
@@ -333,6 +345,10 @@ class RigConfigWindow(ConfigEditorWindow):
             table.setItem(row, 0, QtWidgets.QTableWidgetItem(daq))
             combo = QtWidgets.QComboBox()
             combo.addItems([_NOT_SET, *BOARD_MODELS, CUSTOM_MODEL])
+            combo.setToolTip(
+                "The NI board model, which sets the line counts. Choose Custom to "
+                "enter the counts yourself."
+            )
             if board is not None:
                 known = board == BOARD_MODELS.get(board.model)
                 combo.setCurrentText(board.model if known else CUSTOM_MODEL)
